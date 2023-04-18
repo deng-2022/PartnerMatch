@@ -12,6 +12,7 @@ import com.memory.usercenter.model.User;
 import com.memory.usercenter.service.UserService;
 import com.memory.usercenter.mapper.UserMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,8 @@ import static com.memory.usercenter.constant.UserConstant.*;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private RedisTemplate redisTemplate = new RedisTemplate<String, Object>();
 
     /**
      * 用户注册
@@ -280,13 +284,47 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     /**
      * 管理员修改用户信息
      *
-     * @param user
-     * @return
+     * @param user 要修改的用户
+     * @return 修改信息成功
      */
     @Override
     public String userUpdateByAdmin(User user) {
         userMapper.updateById(user);
         return "修改信息成功";
+    }
+
+    /**
+     * 展示所有用户信息
+     * Redis缓存
+     * 分页查询
+     *
+     * @param currentPage 当前页
+     * @param pageSize    每页显示数
+     * @return 用户列表
+     */
+    @Override
+    public Page<User> selectPage(long currentPage, long pageSize, HttpServletRequest request) {
+        // 获取当前登录用户
+        User loginUser = getLoginUser(request);
+        // 拿到当前登录用户的key(每个用户都有各自对应的key)
+        String redisKey = String.format("memory:user:recommend:%s", loginUser.getId());
+        // 查缓存
+        Page<User> userPage = (Page<User>) redisTemplate.opsForValue().get(redisKey);
+        // 缓存未中, 则返回用户信息
+        if (userPage != null) {
+            return userPage;
+        }
+        // 缓存未命中, 查询数据库
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        userPage = userMapper.selectPage(new Page<>(currentPage, pageSize), lqw);
+        // 将查询到的用户信息写到缓存中
+        try {
+            redisTemplate.opsForValue().set(redisKey, userPage, 30000, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            log.error("redis set key error", e);
+        }
+        // 返回用户数据
+        return userPage;
     }
 
     /**
@@ -312,20 +350,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
-     * 展示所有用户信息
-     * 分页查询
+     * 获取当前登录用户
      *
-     * @param currentPage 当前页
-     * @param pageSize    每页显示数
-     * @return 用户列表
+     * @param request request
+     * @return 脱敏后的用户信息
      */
     @Override
-    public Page<User> selectPage(long currentPage, long pageSize) {
-        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        Page<User> userPage = new Page<>(currentPage, pageSize);
-
-        return userMapper.selectPage(userPage, lqw);
+    public User getLoginUser(HttpServletRequest request) {
+        User loginUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+        return getSafetyUser(loginUser);
     }
+
 
     /**
      * 用户信息脱敏

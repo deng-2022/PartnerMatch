@@ -145,8 +145,8 @@ public class UserController {
      * @return 用户列表
      */
     @GetMapping("/recommend")
-    public BaseResponse<Page<User>> recommend(@RequestParam long currentPage, long pageSize) {
-        Page<User> userList = userService.selectPage(currentPage, pageSize);
+    public BaseResponse<Page<User>> recommend(@RequestParam long currentPage, long pageSize, HttpServletRequest request) {
+        Page<User> userList = userService.selectPage(currentPage, pageSize,request);
         return ResultUtils.success(userList);
     }
 

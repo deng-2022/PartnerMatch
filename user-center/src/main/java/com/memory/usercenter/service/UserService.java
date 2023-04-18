@@ -34,9 +34,11 @@ public interface UserService extends IService<User> {
 
     String userUpdateByAdmin(User user);
 
+    Page<User> selectPage(long currentPage, long pageSize, HttpServletRequest request);
+
     Boolean isAdmin(User loginUser);
 
     Boolean isAdmin(HttpServletRequest request);
 
-    Page<User> selectPage(long currentPage, long pageSize);
+    User getLoginUser(HttpServletRequest request);
 }

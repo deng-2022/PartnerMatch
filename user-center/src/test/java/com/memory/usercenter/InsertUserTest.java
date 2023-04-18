@@ -112,19 +112,19 @@ public class InsertUserTest {
                 j++;
                 User user = new User();
                 user.setUserAccount("memory" + "_" + (UUID.randomUUID() + "").substring(0, 8));
-//                user.setUsername("邓哈哈");
-                user.setUsername("邓哇哇");
+                user.setUsername("邓哈哈");
+//                user.setUsername("邓哇哇");
                 String password = DigestUtils.md5DigestAsHex((SALT + 12345678).getBytes());
                 user.setUserPassword(password);
                 user.setAvatarUrl("https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg");
-//                user.setGender("1");
-                user.setGender("0");
+                user.setGender("1");
+//                user.setGender("0");
                 user.setPhone("18535854763");
                 user.setEmail("3348407547@qq.com");
                 user.setUserStatus(0);
                 user.setUserRole(0);
-//                user.setTags("[\"男\",\"Java\",\"Python\",\"在校本科\",\"开朗\",\"努力中\"]");
-                user.setTags("[\"女\",\"Vue\",\"Python\",\"在校本科\",\"发呆\",\"emo中\"]");
+                user.setTags("[\"男\",\"Java\",\"Python\",\"在校本科\",\"开朗\",\"努力中\"]");
+//                user.setTags("[\"女\",\"Vue\",\"Python\",\"在校本科\",\"发呆\",\"emo中\"]");
 
                 userList.add(user);
                 // 当该线程插满1000条数据，便退出该线程循环
