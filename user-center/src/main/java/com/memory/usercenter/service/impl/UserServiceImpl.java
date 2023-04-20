@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.memory.usercenter.common.ErrorCode;
 import com.memory.usercenter.exception.BusinessException;
-import com.memory.usercenter.model.User;
+import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.service.UserService;
 import com.memory.usercenter.mapper.UserMapper;
 import org.apache.commons.lang3.StringUtils;

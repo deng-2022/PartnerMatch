@@ -1,9 +1,8 @@
 package com.memory.usercenter.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.memory.usercenter.model.User;
+import com.memory.usercenter.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;

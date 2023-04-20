@@ -1,6 +1,6 @@
 package com.memory.usercenter.once;
 
-import com.memory.usercenter.model.User;
+import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.service.UserService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.StopWatch;

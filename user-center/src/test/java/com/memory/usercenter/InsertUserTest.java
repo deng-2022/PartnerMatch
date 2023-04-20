@@ -1,6 +1,6 @@
 package com.memory.usercenter;
 
-import com.memory.usercenter.model.User;
+import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

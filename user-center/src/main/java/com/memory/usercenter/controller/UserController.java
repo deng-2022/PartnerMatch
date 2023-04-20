@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.memory.usercenter.common.BaseResponse;
 import com.memory.usercenter.common.ResultUtils;
 import com.memory.usercenter.exception.BusinessException;
-import com.memory.usercenter.model.User;
+import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.model.request.UserLoginRequest;
 import com.memory.usercenter.model.request.UserRegisterRequest;
 import com.memory.usercenter.service.UserService;

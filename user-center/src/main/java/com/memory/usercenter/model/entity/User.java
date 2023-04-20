@@ -1,4 +1,4 @@
-package com.memory.usercenter.model;
+package com.memory.usercenter.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;

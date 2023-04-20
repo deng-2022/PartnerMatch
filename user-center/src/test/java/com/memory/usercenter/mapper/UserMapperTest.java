@@ -1,9 +1,6 @@
 package com.memory.usercenter.mapper;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-
-import com.memory.usercenter.model.User;
+import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
