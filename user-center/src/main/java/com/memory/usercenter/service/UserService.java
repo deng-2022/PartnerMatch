@@ -19,8 +19,6 @@ public interface UserService extends IService<User> {
 
     String userLogout(HttpServletRequest request);
 
-    User getSafetyUser(User originUser);
-
     List<User> userSearch(String username, HttpServletRequest request);
 
     User getCurrentUser(HttpServletRequest request);
@@ -38,6 +36,8 @@ public interface UserService extends IService<User> {
     Boolean isAdmin(User loginUser);
 
     Boolean isAdmin(HttpServletRequest request);
+
+    User getSafetyUser(User originUser);
 
     User getLoginUser(HttpServletRequest request);
 }
