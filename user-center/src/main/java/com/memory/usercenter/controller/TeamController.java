@@ -1,14 +1,17 @@
 package com.memory.usercenter.controller;
 
 import com.memory.usercenter.common.BaseResponse;
+import com.memory.usercenter.common.ErrorCode;
 import com.memory.usercenter.common.ResultUtils;
+import com.memory.usercenter.exception.BusinessException;
 import com.memory.usercenter.model.entity.Team;
+import com.memory.usercenter.model.request.TeamAddRequest;
+import com.memory.usercenter.service.TeamService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,12 +22,27 @@ import java.util.List;
  * Version 1.0
  */
 
-@Controller
+@RestController
 @RequestMapping("/team")
 public class TeamController {
+    @Resource
+    private TeamService teamService;
+
+    /**
+     * 新增队伍
+     *
+     * @param teamAddRequest 新增队伍信息
+     * @param request        request
+     * @return 新增成功与否
+     */
     @PostMapping("/add")
-    public BaseResponse<Boolean> teamAdd() {
-        return ResultUtils.success(true);
+    public BaseResponse<String> teamAdd(@RequestBody TeamAddRequest teamAddRequest, HttpServletRequest request) {
+        // controller对参数的校验
+        if (teamAddRequest == null)
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
+
+        String teamAdd = teamService.teamAdd(teamAddRequest, request);
+        return ResultUtils.success(teamAdd);
     }
 
     @DeleteMapping("/delete")

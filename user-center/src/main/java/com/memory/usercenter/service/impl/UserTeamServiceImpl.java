@@ -3,7 +3,7 @@ package com.memory.usercenter.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.memory.usercenter.model.entity.UserTeam;
 import com.memory.usercenter.service.UserTeamService;
-import generator.mapper.UserTeamMapper;
+import com.memory.usercenter.mapper.UserTeamMapper;
 import org.springframework.stereotype.Service;
 
 /**

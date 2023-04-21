@@ -7,13 +7,18 @@ package com.memory.usercenter.constant;
  * Version 1.0
  */
 public enum TeamStatusEnum {
-
     PUBLIC(0, "公开"),
     PRIVATE(1, "私有"),
     SECRET(2, "加密");
 
+    /**
+     * 状态码
+     */
     private int value;
 
+    /**
+     * 状态描述
+     */
     private String text;
 
     /**

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.memory.usercenter.model.entity.Team;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.memory.usercenter.model.entity.User;
+import com.memory.usercenter.model.request.TeamAddRequest;
 import com.memory.usercenter.model.request.TeamQuery;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +15,14 @@ import javax.servlet.http.HttpServletRequest;
  * @createDate 2023-04-20 09:27:14
  */
 public interface TeamService extends IService<Team> {
-    boolean teamAdd(Team team, HttpServletRequest request);
+    /**
+     * 新增队伍
+     *
+     * @param teamAddRequest 新增队伍信息
+     * @param request        request
+     * @return 新增成功与否
+     */
+    String teamAdd(TeamAddRequest teamAddRequest, HttpServletRequest request);
 
     int teamDelete(long id);
 

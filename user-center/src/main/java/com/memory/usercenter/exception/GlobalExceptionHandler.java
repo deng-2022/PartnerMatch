@@ -4,7 +4,6 @@ import com.memory.usercenter.common.BaseResponse;
 import com.memory.usercenter.common.ErrorCode;
 import com.memory.usercenter.common.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -18,13 +17,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
     /**
-     * 捕获局部业务代码下的自定义异常信息
+     * 捕获自定义异常对象
      *
      * @param e 自定义异常
-     * @return 封装返回失败状态
+     * @return 封装返回执行失败异常信息
      */
     @ExceptionHandler(BusinessException.class)
-    public BaseResponse businessExceptionHandler(BusinessException e) {
+    public BaseResponse locallyCustomException(BusinessException e) {
         log.error("businessException: " + e.getMessage(), e);
         log.info("" + e.getCode());
         log.info(e.getMessage());
@@ -33,15 +32,16 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 捕获common/ErrorCode下封装的全局自定义异常信息
+     * 捕获其他异常
      *
-     * @param e 自定义异常
-     * @return 封装返回失败状态
+     * @param e 其他异常
+     * @return 封装返回请求失败异常信息
      */
-    //捕获自定义的异常2
     @ExceptionHandler(RuntimeException.class)
-    public BaseResponse runtimeExceptionHandler(BusinessException e) {
+    public BaseResponse globalCustomException(Exception e) {
         log.error("runtimeException", e);
         return ResultUtils.error(ErrorCode.SYSTEM_ERROR);
     }
+
+
 }

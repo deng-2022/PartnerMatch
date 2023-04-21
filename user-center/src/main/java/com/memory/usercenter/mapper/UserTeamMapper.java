@@ -1,4 +1,4 @@
-package generator.mapper;
+package com.memory.usercenter.mapper;
 
 import com.memory.usercenter.model.entity.UserTeam;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

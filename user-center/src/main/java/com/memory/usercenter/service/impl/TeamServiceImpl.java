@@ -10,10 +10,11 @@ import com.memory.usercenter.exception.BusinessException;
 import com.memory.usercenter.model.entity.Team;
 import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.model.entity.UserTeam;
+import com.memory.usercenter.model.request.TeamAddRequest;
 import com.memory.usercenter.model.request.TeamQuery;
 import com.memory.usercenter.service.TeamService;
 import com.memory.usercenter.service.UserTeamService;
-import generator.mapper.TeamMapper;
+import com.memory.usercenter.mapper.TeamMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -42,73 +43,74 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     /**
      * 新增队伍
      *
-     * @param team 队伍
+     * @param teamAddRequest 队伍
      * @return 队伍id
      */
     @Override
     @Transactional
-    public boolean teamAdd(Team team, HttpServletRequest request) {
-//        1. 请求参数是否为空？
-        if (team == null)
-            throw new BusinessException(ErrorCode.PARMS_ERROR);
+    public String teamAdd(TeamAddRequest teamAddRequest, HttpServletRequest request) {
+        Team team = new Team();
+        BeanUtils.copyProperties(teamAddRequest, team);
 
-//        2. 是否登录，未登录不允许创建
+        // 1.是否登录，未登录不允许创建
         User loginUser = getLoginUser(request);
         if (loginUser == null)
-            throw new BusinessException(ErrorCode.NOT_REGISTER);
+            throw new BusinessException(ErrorCode.NOT_LOGIN);
 
-//        3. 队伍人数 > 1 且 <= 20
+        // 2.队伍人数 > 1 且 <= 20
         Integer maxNum = team.getMaxNum();
         if (maxNum < 1 || maxNum > 20)
-            throw new BusinessException("队伍人数不符合要求", 70001, "");
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍人数不符合要求");
 
-//        b. 队伍标题 <= 20
+        // 3.队伍标题 <= 20
         String name = team.getName();
         if (StringUtils.isBlank(name) || name.length() > 20)
-            throw new BusinessException("队伍标题不符合要求", 70002, "");
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍标题不符合要求");
 
-//        c. 描述 <= 512
+        // 4.描述 <= 512
         String description = team.getDescription();
         if (StringUtils.isBlank(description) || description.length() > 512)
-            throw new BusinessException("队伍描述不符合要求", 70003, "");
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍描述不符合要求");
 
-//        d. status 是否公开（int）不传默认为 0（公开）
+        // 5.status 是否公开（int）不传默认为 0（公开）
         int status = Optional.ofNullable(team.getStatus()).orElse(0);
         TeamStatusEnum statusEnum = TeamStatusEnum.getEnumByValue(status);
         if (statusEnum == null)
-            throw new BusinessException("队伍状态不符合要求", 70004, "");
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍状态不符合要求");
 
-//        e. 如果 status 是加密状态，一定要有密码，且密码 <= 32
+        // 6.如果 status 是加密状态，一定要有密码，且密码 <= 32
         String password = team.getPassword();
         if (TeamStatusEnum.SECRET.equals(statusEnum)) {
             if (StringUtils.isBlank(password) || password.length() > 32)
-                throw new BusinessException("队伍密码不符合要求", 70005, "");
+                throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍密码不符合要求");
         }
-//        f.   当前时间 > 超时时间
+        // 7.当前时间 > 超时时间
         Date expireTime = team.getExpireTime();
         if (new Date().after(expireTime))
-            throw new BusinessException("超时时间不符合要求", 70006, "");
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "超时时间不符合要求");
 
-//        g. 校验用户最多创建 5 个队伍
-        Long userId = team.getUserId();
+        // 8. 校验用户最多创建 5 个队伍
+        Long userId = loginUser.getId();
         QueryWrapper<Team> lqw = new QueryWrapper<>();
         lqw.eq("user_id", userId);
         long count = this.count(lqw);
         if (count >= 5)
-            throw new BusinessException("无法创建新的队伍", 70007, "该用户创建队伍数量超出限制");
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "该用户创建队伍数量超出限制");
 
-//        4. 插入队伍信息到队伍表
+        // 9.插入队伍信息到队伍表
         team.setId(null);
         team.setUserId(userId);
         boolean teamSave = this.save(team);
+        if (!teamSave) throw new BusinessException(ErrorCode.UPDATE_ERROR);
 
-//        5. 插入用户 => 队伍关系到关系表
+        // 10.插入用户 => 队伍关系到关系表
         UserTeam userTeam = new UserTeam();
         userTeam.setUserId(userId);
         userTeam.setTeamId(team.getId());
         boolean userTeamSave = userTeamService.save(userTeam);
+        if (!userTeamSave) throw new BusinessException(ErrorCode.UPDATE_ERROR);
 
-        return teamSave && userTeamSave;
+        return "新增队伍成功";
     }
 
     /**
@@ -155,7 +157,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     @Override
     public Page<Team> teamList(TeamQuery teamQuery, long current, long pageSize) {
         Team team = new Team();
-        BeanUtils.copyProperties(team, teamQuery);
+        BeanUtils.copyProperties(teamQuery, team);
         LambdaQueryWrapper<Team> lqw = new LambdaQueryWrapper<>(team);
         return teamMapper.selectPage(new Page<>(current, pageSize), lqw);
     }
