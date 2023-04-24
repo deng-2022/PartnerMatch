@@ -10,8 +10,8 @@ import com.memory.usercenter.exception.BusinessException;
 import com.memory.usercenter.model.entity.Team;
 import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.model.entity.UserTeam;
-import com.memory.usercenter.model.request.TeamAddRequest;
-import com.memory.usercenter.model.request.TeamQuery;
+import com.memory.usercenter.model.request.team.TeamAddRequest;
+import com.memory.usercenter.model.request.team.TeamQuery;
 import com.memory.usercenter.service.TeamService;
 import com.memory.usercenter.service.UserTeamService;
 import com.memory.usercenter.mapper.TeamMapper;
@@ -114,6 +114,46 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     }
 
     /**
+     * 查询队伍(分页查询)
+     *
+     * @param teamQuery 查询参数
+     * @return 符合条件的队伍
+     */
+    @Override
+    public Page<Team> teamList(TeamQuery teamQuery) {
+        Team team = new Team();
+        BeanUtils.copyProperties(teamQuery, team);
+        QueryWrapper<Team> tqw = new QueryWrapper<>();
+        // 根据队伍名查询
+        String name = teamQuery.getName();
+        if (StringUtils.isNotBlank(name) && name.length() <= 20)
+            tqw.like("name", name);
+
+        // 根据队伍描述查询
+        String description = teamQuery.getDescription();
+        if (StringUtils.isNotBlank(description) && description.length() <= 512)
+            tqw.like("description", description);
+
+        // 根据队长id查询
+        Long userId = teamQuery.getUserId();
+        if (userId != null && userId > 0)
+            tqw.eq("user_id", userId);
+
+        // 根据最大人数查询
+        Integer maxNum = teamQuery.getMaxNum();
+        if (maxNum != null && maxNum > 0)
+            tqw.eq("max_num", maxNum);
+
+        // 根据队伍状态查询
+        Integer status = teamQuery.getStatus();
+        TeamStatusEnum statusEnum = TeamStatusEnum.getEnumByValue(status);
+        if (statusEnum != null)
+            tqw.like("status", status);
+
+        return teamMapper.selectPage(new Page<>(1, 5), tqw);
+    }
+
+    /**
      * 删除队伍
      *
      * @param id
@@ -146,21 +186,6 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         return teamMapper.selectById(id);
     }
 
-    /**
-     * 列举队伍
-     *
-     * @param teamQuery
-     * @param current
-     * @param pageSize
-     * @return
-     */
-    @Override
-    public Page<Team> teamList(TeamQuery teamQuery, long current, long pageSize) {
-        Team team = new Team();
-        BeanUtils.copyProperties(teamQuery, team);
-        LambdaQueryWrapper<Team> lqw = new LambdaQueryWrapper<>(team);
-        return teamMapper.selectPage(new Page<>(current, pageSize), lqw);
-    }
 
     /**
      * 用户信息脱敏

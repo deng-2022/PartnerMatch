@@ -5,8 +5,8 @@ import com.memory.usercenter.common.BaseResponse;
 import com.memory.usercenter.common.ResultUtils;
 import com.memory.usercenter.exception.BusinessException;
 import com.memory.usercenter.model.entity.User;
-import com.memory.usercenter.model.request.UserLoginRequest;
-import com.memory.usercenter.model.request.UserRegisterRequest;
+import com.memory.usercenter.model.request.user.UserLoginRequest;
+import com.memory.usercenter.model.request.user.UserRegisterRequest;
 import com.memory.usercenter.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -146,7 +146,9 @@ public class UserController {
      */
     @GetMapping("/recommend")
     public BaseResponse<Page<User>> recommend(@RequestParam long currentPage, long pageSize, HttpServletRequest request) {
-        Page<User> userList = userService.selectPage(currentPage, pageSize,request);
+        // controller对参数的校验
+
+        Page<User> userList = userService.selectPage(currentPage, pageSize, request);
         return ResultUtils.success(userList);
     }
 

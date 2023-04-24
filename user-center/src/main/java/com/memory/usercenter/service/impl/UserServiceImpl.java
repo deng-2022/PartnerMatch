@@ -328,6 +328,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
+     * 校验是否为管理员
+     *
      * @param loginUser 校验的用户
      * @return 校验成功与否(t / f)
      */

@@ -4,13 +4,15 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
+
 import lombok.Data;
 
 /**
  * 队伍
+ *
  * @TableName team
  */
-@TableName(value ="team")
+@TableName(value = "team")
 @Data
 public class Team implements Serializable {
     /**
@@ -40,9 +42,14 @@ public class Team implements Serializable {
     private Date expireTime;
 
     /**
-     * 用户id
+     * 队长id
      */
     private Long userId;
+
+    /**
+     * 已加人数
+     */
+    private Integer joinNum;
 
     /**
      * 0 - 公开，1 - 私有，2 - 加密
@@ -60,7 +67,7 @@ public class Team implements Serializable {
     private Date createTime;
 
     /**
-     * 
+     *
      */
     private Date updateTime;
 

@@ -1,4 +1,4 @@
-package com.memory.usercenter.model.request;
+package com.memory.usercenter.model.request.team;
 import lombok.Data;
 
 import java.util.Date;

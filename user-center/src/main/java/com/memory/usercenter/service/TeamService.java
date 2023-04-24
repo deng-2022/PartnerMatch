@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.memory.usercenter.model.entity.Team;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.memory.usercenter.model.entity.User;
-import com.memory.usercenter.model.request.TeamAddRequest;
-import com.memory.usercenter.model.request.TeamQuery;
+import com.memory.usercenter.model.request.team.TeamAddRequest;
+import com.memory.usercenter.model.request.team.TeamQuery;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,7 +30,7 @@ public interface TeamService extends IService<Team> {
 
     Team getTeam(long id);
 
-    Page<Team> teamList(TeamQuery teamQuery, long current, long pageSize);
+    Page<Team> teamList(TeamQuery teamQuery);
 
     User getLoginUser(HttpServletRequest request);
 }

@@ -1,13 +1,14 @@
 package com.memory.usercenter.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.memory.usercenter.common.BaseResponse;
 import com.memory.usercenter.common.ErrorCode;
 import com.memory.usercenter.common.ResultUtils;
 import com.memory.usercenter.exception.BusinessException;
 import com.memory.usercenter.model.entity.Team;
-import com.memory.usercenter.model.request.TeamAddRequest;
+import com.memory.usercenter.model.request.team.TeamAddRequest;
+import com.memory.usercenter.model.request.team.TeamQuery;
 import com.memory.usercenter.service.TeamService;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -31,7 +32,7 @@ public class TeamController {
     /**
      * 新增队伍
      *
-     * @param teamAddRequest 新增队伍信息
+     * @param teamAddRequest 新增队伍参数
      * @param request        request
      * @return 新增成功与否
      */
@@ -60,9 +61,19 @@ public class TeamController {
         return ResultUtils.success(new Team());
     }
 
+    /**
+     * 查询队伍
+     * 分页查询
+     *
+     * @param teamQuery 查询队伍参数
+     * @return 队伍列表
+     */
     @GetMapping("/list/page")
-    public BaseResponse<List<Team>> teamList() {
-        return ResultUtils.success(new ArrayList<Team>());
+    public BaseResponse<Page<Team>> teamList(TeamQuery teamQuery) {
+        // controller对参数的校验
+
+        Page<Team> teamPage = teamService.teamList(teamQuery);
+        return ResultUtils.success(teamPage);
     }
 
 }
