@@ -5,8 +5,8 @@ import com.memory.usercenter.common.BaseResponse;
 import com.memory.usercenter.common.ResultUtils;
 import com.memory.usercenter.exception.BusinessException;
 import com.memory.usercenter.model.entity.User;
-import com.memory.usercenter.model.request.user.UserLoginRequest;
-import com.memory.usercenter.model.request.user.UserRegisterRequest;
+import com.memory.usercenter.model.request.user.UserLogin;
+import com.memory.usercenter.model.request.user.UserRegister;
 import com.memory.usercenter.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -41,7 +41,7 @@ public class UserController {
      * @return id
      */
     @PostMapping("/register")
-    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+    public BaseResponse<Long> userRegister(@RequestBody UserRegister userRegisterRequest) {
         //controller对参数的校验
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
@@ -62,7 +62,7 @@ public class UserController {
      * @return User
      */
     @PostMapping("/login")
-    public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public BaseResponse<User> userLogin(@RequestBody UserLogin userLoginRequest, HttpServletRequest request) {
         //controller对参数的校验
         String userAccount = userLoginRequest.getUserAccount();
         String userPassword = userLoginRequest.getUserPassword();

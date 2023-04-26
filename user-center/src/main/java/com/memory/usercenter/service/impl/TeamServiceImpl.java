@@ -1,6 +1,5 @@
 package com.memory.usercenter.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,8 +9,9 @@ import com.memory.usercenter.exception.BusinessException;
 import com.memory.usercenter.model.entity.Team;
 import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.model.entity.UserTeam;
-import com.memory.usercenter.model.request.team.TeamAddRequest;
+import com.memory.usercenter.model.request.team.TeamAdd;
 import com.memory.usercenter.model.request.team.TeamQuery;
+import com.memory.usercenter.model.request.team.TeamUpdate;
 import com.memory.usercenter.service.TeamService;
 import com.memory.usercenter.service.UserTeamService;
 import com.memory.usercenter.mapper.TeamMapper;
@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Optional;
 
+import static com.memory.usercenter.constant.UserConstant.ADMIN_ROLE;
 import static com.memory.usercenter.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
@@ -43,15 +44,12 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     /**
      * 新增队伍
      *
-     * @param teamAddRequest 队伍
+     * @param team 队伍
      * @return 队伍id
      */
     @Override
     @Transactional
-    public String teamAdd(TeamAddRequest teamAddRequest, HttpServletRequest request) {
-        Team team = new Team();
-        BeanUtils.copyProperties(teamAddRequest, team);
-
+    public String teamAdd(TeamAdd team, HttpServletRequest request) {
         // 1.是否登录，未登录不允许创建
         User loginUser = getLoginUser(request);
         if (loginUser == null)
@@ -78,18 +76,26 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (statusEnum == null)
             throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍状态不符合要求");
 
-        // 6.如果 status 是加密状态，一定要有密码，且密码 <= 32
+        // 6.校验队伍密码
         String password = team.getPassword();
+        // 6.1.如果队伍非加密, 则不允许设置密码
+        if (statusEnum.getValue() != 2) {
+            if (StringUtils.isNotBlank(password))
+                throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍密码不符合要求");
+        }
+
+        // 6.2.如果队伍加密, 一定要有密码, 且密码 <= 32
         if (TeamStatusEnum.SECRET.equals(statusEnum)) {
             if (StringUtils.isBlank(password) || password.length() > 32)
                 throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍密码不符合要求");
         }
+
         // 7.当前时间 > 超时时间
         Date expireTime = team.getExpireTime();
         if (new Date().after(expireTime))
             throw new BusinessException(ErrorCode.PARMS_ERROR, "超时时间不符合要求");
 
-        // 8. 校验用户最多创建 5 个队伍
+        // 8.校验用户已创建队伍数量(最多创建 5 个队伍)
         Long userId = loginUser.getId();
         QueryWrapper<Team> lqw = new QueryWrapper<>();
         lqw.eq("user_id", userId);
@@ -97,60 +103,25 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (count >= 5)
             throw new BusinessException(ErrorCode.PARMS_ERROR, "该用户创建队伍数量超出限制");
 
-        // 9.插入队伍信息到队伍表
-        team.setId(null);
-        team.setUserId(userId);
-        boolean teamSave = this.save(team);
+        Team addTeam = new Team();
+        BeanUtils.copyProperties(team, addTeam);
+
+        // 9.插入队伍信息到team表
+        addTeam.setId(null);
+        addTeam.setUserId(userId);
+
+        boolean teamSave = this.save(addTeam);
         if (!teamSave) throw new BusinessException(ErrorCode.UPDATE_ERROR);
 
-        // 10.插入用户 => 队伍关系到关系表
+        // 10.插入用户-队伍关系到user_team表
         UserTeam userTeam = new UserTeam();
         userTeam.setUserId(userId);
-        userTeam.setTeamId(team.getId());
+        userTeam.setTeamId(addTeam.getId());
+
         boolean userTeamSave = userTeamService.save(userTeam);
         if (!userTeamSave) throw new BusinessException(ErrorCode.UPDATE_ERROR);
 
         return "新增队伍成功";
-    }
-
-    /**
-     * 查询队伍(分页查询)
-     *
-     * @param teamQuery 查询参数
-     * @return 符合条件的队伍
-     */
-    @Override
-    public Page<Team> teamList(TeamQuery teamQuery) {
-        Team team = new Team();
-        BeanUtils.copyProperties(teamQuery, team);
-        QueryWrapper<Team> tqw = new QueryWrapper<>();
-        // 根据队伍名查询
-        String name = teamQuery.getName();
-        if (StringUtils.isNotBlank(name) && name.length() <= 20)
-            tqw.like("name", name);
-
-        // 根据队伍描述查询
-        String description = teamQuery.getDescription();
-        if (StringUtils.isNotBlank(description) && description.length() <= 512)
-            tqw.like("description", description);
-
-        // 根据队长id查询
-        Long userId = teamQuery.getUserId();
-        if (userId != null && userId > 0)
-            tqw.eq("user_id", userId);
-
-        // 根据最大人数查询
-        Integer maxNum = teamQuery.getMaxNum();
-        if (maxNum != null && maxNum > 0)
-            tqw.eq("max_num", maxNum);
-
-        // 根据队伍状态查询
-        Integer status = teamQuery.getStatus();
-        TeamStatusEnum statusEnum = TeamStatusEnum.getEnumByValue(status);
-        if (statusEnum != null)
-            tqw.like("status", status);
-
-        return teamMapper.selectPage(new Page<>(1, 5), tqw);
     }
 
     /**
@@ -167,12 +138,122 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     /**
      * 修改队伍
      *
-     * @param team
-     * @return
+     * @param team 队伍修改信息
+     * @return 修改成功与否
      */
     @Override
-    public int teamUpdate(Team team) {
-        return teamMapper.updateById(team);
+    public String teamUpdate(TeamUpdate team, HttpServletRequest request) {
+        // 校验是否登录
+        User loginUser = getLoginUser(request);
+        if (loginUser == null)
+            throw new BusinessException(ErrorCode.NOT_LOGIN);
+
+        // 1.校验修改权限(只有管理员或队长可以修改)
+        if (!loginUser.getId().equals(team.getUserId()) && !isAdmin(loginUser))
+            throw new BusinessException(ErrorCode.NO_AUTH, "非队长且非管理员");
+
+        // 2.判断队伍是否存在
+        Long id = team.getId();
+        if (id == null)
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
+
+        Team currentTeam = this.getById(id);
+        if (currentTeam == null)
+            throw new BusinessException(ErrorCode.UPDATE_ERROR, "该队伍不存在");
+
+        // 3.校验队伍名
+        String name = team.getName();
+        if (StringUtils.isBlank(name) || name.length() > 20)
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍名不符合要求");
+
+        // 4.校验队伍描述
+        String description = team.getDescription();
+        if (StringUtils.isBlank(description) || description.length() > 512)
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍描述不符合要求");
+
+        // 5.校验队伍状态
+        Integer status = team.getStatus();
+        TeamStatusEnum statusEnum = TeamStatusEnum.getEnumByValue(status);
+        if (statusEnum == null)
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍状态不符合要求");
+
+        // 6.校验队伍密码
+        String password = team.getPassword();
+        // 6.1.如果队伍非加密, 则不允许设置密码
+        if (!TeamStatusEnum.SECRET.equals(statusEnum)) {
+            if (StringUtils.isNotBlank(password))
+                throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍密码不符合要求");
+        }
+
+        // 6.2.如果队伍加密, 一定要有密码, 且密码 <= 32
+        if (TeamStatusEnum.SECRET.equals(statusEnum)) {
+            if (StringUtils.isBlank(password) || password.length() > 32)
+                throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍密码不符合要求");
+        }
+
+        // 7.更新队伍信息
+        Team updateTeam = new Team();
+        BeanUtils.copyProperties(team, updateTeam);
+
+        boolean update = this.updateById(updateTeam);
+        if (!update)
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "修改队伍失败");
+
+        return "修改信息成功";
+    }
+
+    /**
+     * 查询队伍(分页查询)
+     *
+     * @param team 查询参数
+     * @return 符合条件的队伍
+     */
+    @Override
+    public Page<Team> teamList(TeamQuery team, HttpServletRequest request) {
+        // 登录校验
+        User loginUser = getLoginUser(request);
+        if (loginUser != null)
+            throw new BusinessException(ErrorCode.NOT_LOGIN);
+
+        QueryWrapper<Team> tqw = new QueryWrapper<>();
+
+        // 1.根据队伍名查询
+        String name = team.getName();
+        if (StringUtils.isBlank(name) || name.length() > 20)
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍名不符合要求");
+        tqw.like("name", name);
+
+        // 2.根据队伍描述查询
+        String description = team.getDescription();
+        if (StringUtils.isBlank(description) || description.length() > 512)
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍描述不符合要求");
+        tqw.like("description", description);
+
+        // 3.根据队长id查询
+        Long userId = team.getUserId();
+        if (userId == null || userId < 0)
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队长id不符合要求");
+        tqw.eq("user_id", userId);
+
+        // 4.根据最大人数查询
+        Integer maxNum = team.getMaxNum();
+        if (maxNum == null || maxNum < 0)
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍最大人数不符合要求");
+        tqw.eq("max_num", maxNum);
+
+        // 5.根据队伍状态查询
+        Integer status = team.getStatus();
+        TeamStatusEnum statusEnum = TeamStatusEnum.getEnumByValue(status);
+        if (statusEnum == null)
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍状态不符合要求");
+        tqw.like("status", status);
+
+        // 6.分页查询
+        Page<Team> teamPage = this.page(new Page<>(1, 5), tqw);
+        if (teamPage == null)
+            throw new BusinessException(ErrorCode.UPDATE_ERROR);
+
+        return teamPage;
     }
 
     /**
@@ -185,7 +266,6 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
     public Team getTeam(long id) {
         return teamMapper.selectById(id);
     }
-
 
     /**
      * 用户信息脱敏
@@ -214,6 +294,19 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
 
         return safetyUser;
     }
+
+    /**
+     * 校验是否为管理员
+     *
+     * @param loginUser 校验的用户
+     * @return 校验成功与否(t / f)
+     */
+    @Override
+    public Boolean isAdmin(User loginUser) {
+        //校验是否为管理员
+        return loginUser != null && loginUser.getUserRole() == ADMIN_ROLE;
+    }
+
 
     /**
      * 获取当前登录用户

@@ -7,8 +7,19 @@ package com.memory.usercenter.constant;
  * Version 1.0
  */
 public enum TeamStatusEnum {
+    /**
+     * 0 - 公开, 在队伍大厅中可以直接加入
+     */
     PUBLIC(0, "公开"),
+
+    /**
+     * 1 - 私有, 在队伍大厅中不可以直接加入
+     */
     PRIVATE(1, "私有"),
+
+    /**
+     * 2 - 公开且加密, 加入队伍需要密码
+     */
     SECRET(2, "加密");
 
     /**

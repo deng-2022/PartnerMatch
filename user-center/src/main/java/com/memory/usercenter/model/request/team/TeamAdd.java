@@ -1,4 +1,5 @@
 package com.memory.usercenter.model.request.team;
+
 import lombok.Data;
 
 import java.util.Date;
@@ -6,11 +7,11 @@ import java.util.Date;
 /**
  * @author 邓哈哈
  * 2023/4/20 14:22
- * Function: 队伍创建接受类
+ * Function: 队伍新增参数
  * Version 1.0
  */
 @Data
-public class TeamAddRequest {
+public class TeamAdd {
     /**
      * 队伍名称
      */
