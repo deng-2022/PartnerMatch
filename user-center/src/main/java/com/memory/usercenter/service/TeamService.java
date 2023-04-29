@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.memory.usercenter.model.entity.Team;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.memory.usercenter.model.entity.User;
-import com.memory.usercenter.model.request.team.TeamAdd;
-import com.memory.usercenter.model.request.team.TeamQuery;
-import com.memory.usercenter.model.request.team.TeamUpdate;
+import com.memory.usercenter.model.request.team.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,6 +37,20 @@ public interface TeamService extends IService<Team> {
     Team getTeam(long id);
 
     /**
+     * 退出队伍
+     *
+     * @return 退出成功与否
+     */
+    String quitTeam(TeamQuit team, HttpServletRequest request);
+
+    /**
+     * 删除队伍
+     *
+     * @return 删除成功与否
+     */
+//    String deleteTeam(TeamDelete teamDelete, HttpServletRequest request);
+
+    /**
      * 查询队伍
      * 分页查询
      *
@@ -46,6 +58,15 @@ public interface TeamService extends IService<Team> {
      * @return 队伍列表
      */
     Page<Team> teamList(TeamQuery teamQuery, HttpServletRequest request);
+
+    /**
+     * 加入队伍
+     *
+     * @param team    加入队伍参数
+     * @param request request
+     * @return 加入队伍成功
+     */
+    String joinTeam(TeamJoin team, HttpServletRequest request);
 
     Boolean isAdmin(User loginUser);
 

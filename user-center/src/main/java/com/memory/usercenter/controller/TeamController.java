@@ -6,9 +6,7 @@ import com.memory.usercenter.common.ErrorCode;
 import com.memory.usercenter.common.ResultUtils;
 import com.memory.usercenter.exception.BusinessException;
 import com.memory.usercenter.model.entity.Team;
-import com.memory.usercenter.model.request.team.TeamAdd;
-import com.memory.usercenter.model.request.team.TeamQuery;
-import com.memory.usercenter.model.request.team.TeamUpdate;
+import com.memory.usercenter.model.request.team.*;
 import com.memory.usercenter.service.TeamService;
 import org.springframework.web.bind.annotation.*;
 
@@ -82,6 +80,40 @@ public class TeamController {
 
         Page<Team> teamPage = teamService.teamList(team, request);
         return ResultUtils.success(teamPage);
+    }
+
+    /**
+     * 加入队伍
+     *
+     * @param team    加入队伍参数
+     * @param request request
+     * @return 加入队伍成功
+     */
+    @PostMapping("/join")
+    public BaseResponse<String> joinTeam(@RequestBody TeamJoin team, HttpServletRequest request) {
+        // controller对参数的校验
+        if (team == null)
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
+
+        String joinTeam = teamService.joinTeam(team, request);
+        return ResultUtils.success(joinTeam);
+    }
+
+    /**
+     * 退出队伍
+     *
+     * @param team    退出队伍参数
+     * @param request request
+     * @return 退出队伍成功
+     */
+    @PostMapping("/join")
+    public BaseResponse<String> quitTeam(@RequestBody TeamQuit team, HttpServletRequest request) {
+        // controller对参数的校验
+        if (team == null)
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
+
+        String joinTeam = teamService.quitTeam(team, request);
+        return ResultUtils.success(joinTeam);
     }
 
     @GetMapping("/get")

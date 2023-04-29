@@ -15,6 +15,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 public class UserCenterApplication {
     public static void main(String[] args) {
         SpringApplication.run(UserCenterApplication.class, args);
+//        http://localhost:8081/api/doc.html
     }
 
 }
