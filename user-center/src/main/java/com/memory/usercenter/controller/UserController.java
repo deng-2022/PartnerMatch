@@ -140,7 +140,7 @@ public class UserController {
     }
 
     /**
-     * 根据标签查询用户
+     * 展示用户列表
      *
      * @return 用户列表
      */

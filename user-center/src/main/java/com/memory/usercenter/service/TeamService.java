@@ -7,6 +7,7 @@ import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.model.request.team.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author Lenovo
@@ -34,22 +35,6 @@ public interface TeamService extends IService<Team> {
      */
     String teamUpdate(TeamUpdate team, HttpServletRequest request);
 
-    Team getTeam(long id);
-
-    /**
-     * 退出队伍
-     *
-     * @return 退出成功与否
-     */
-    String quitTeam(TeamQuit team, HttpServletRequest request);
-
-    /**
-     * 删除队伍
-     *
-     * @return 删除成功与否
-     */
-//    String deleteTeam(TeamDelete teamDelete, HttpServletRequest request);
-
     /**
      * 查询队伍
      * 分页查询
@@ -68,7 +53,38 @@ public interface TeamService extends IService<Team> {
      */
     String joinTeam(TeamJoin team, HttpServletRequest request);
 
+    /**
+     * 退出队伍
+     *
+     * @return 退出成功与否
+     */
+    String quitTeam(TeamQuit team, HttpServletRequest request);
+
+    /**
+     * 解散队伍
+     *
+     * @return 删除成功与否
+     */
+    String deleteTeam(TeamDelete teamDelete, HttpServletRequest request);
+
+    /**
+     * 获取当前队伍信息
+     *
+     * @param teamId 队伍id
+     * @return 队伍信息
+     */
+    Team getTeam(Long teamId, HttpServletRequest request);
+
+    /**
+     * 获取已加入队伍信息
+     *
+     * @param userId 用户id
+     * @return 队伍信息
+     */
+    List<Team> getJoinedTeam(Long userId, HttpServletRequest request);
+
     Boolean isAdmin(User loginUser);
 
     User getLoginUser(HttpServletRequest request);
+
 }

@@ -1,6 +1,7 @@
 package com.memory.usercenter.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.memory.usercenter.model.entity.Team;
 import com.memory.usercenter.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 

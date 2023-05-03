@@ -37,11 +37,6 @@ public class Team implements Serializable {
     private Integer maxNum;
 
     /**
-     * 过期时间
-     */
-    private Date expireTime;
-
-    /**
      * 队长id
      */
     private Long userId;
@@ -62,12 +57,18 @@ public class Team implements Serializable {
     private String password;
 
     /**
+     * 过期时间
+     */
+    private Date expireTime;
+
+
+    /**
      * 创建时间
      */
     private Date createTime;
 
     /**
-     *
+     * 更新时间
      */
     private Date updateTime;
 

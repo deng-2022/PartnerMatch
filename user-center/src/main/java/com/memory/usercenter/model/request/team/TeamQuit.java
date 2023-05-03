@@ -24,5 +24,4 @@ public class TeamQuit {
      * 剩余人数
      */
     private Integer joinNum;
-
 }

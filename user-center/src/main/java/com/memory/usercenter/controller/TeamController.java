@@ -6,12 +6,14 @@ import com.memory.usercenter.common.ErrorCode;
 import com.memory.usercenter.common.ResultUtils;
 import com.memory.usercenter.exception.BusinessException;
 import com.memory.usercenter.model.entity.Team;
+import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.model.request.team.*;
 import com.memory.usercenter.service.TeamService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author 邓哈哈
@@ -41,11 +43,6 @@ public class TeamController {
 
         String teamAdd = teamService.teamAdd(team, request);
         return ResultUtils.success(teamAdd);
-    }
-
-    @DeleteMapping("/delete")
-    public BaseResponse<Boolean> teamDelete() {
-        return ResultUtils.success(true);
     }
 
     /**
@@ -106,7 +103,7 @@ public class TeamController {
      * @param request request
      * @return 退出队伍成功
      */
-    @PostMapping("/join")
+    @PostMapping("/quit")
     public BaseResponse<String> quitTeam(@RequestBody TeamQuit team, HttpServletRequest request) {
         // controller对参数的校验
         if (team == null)
@@ -116,8 +113,55 @@ public class TeamController {
         return ResultUtils.success(joinTeam);
     }
 
-    @GetMapping("/get")
-    public BaseResponse<Team> getTeam() {
-        return ResultUtils.success(new Team());
+    /**
+     * 解散队伍
+     *
+     * @param team    解散队伍参数
+     * @param request request
+     * @return 解散成功与否
+     */
+    @PostMapping("/delete")
+    public BaseResponse<String> deleteTeam(@RequestBody TeamDelete team, HttpServletRequest request) {
+        // controller对参数的校验
+        if (team == null) {
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
+        }
+
+        String deleteTeam = teamService.deleteTeam(team, request);
+        return ResultUtils.success(deleteTeam);
+    }
+
+    /**
+     * 获取当前队伍信息
+     *
+     * @param teamId 队伍id
+     * @return 队伍信息
+     */
+    @GetMapping("/one")
+    public BaseResponse<Team> getTeam(Long teamId, HttpServletRequest request) {
+        // controller对参数的校验
+        if (teamId == null) {
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
+        }
+
+        Team team = teamService.getTeam(teamId, request);
+        return ResultUtils.success(team);
+    }
+
+    /**
+     * 获取当前队伍信息
+     *
+     * @param userId 用户id
+     * @return 队伍信息
+     */
+    @GetMapping("/joined")
+    public BaseResponse<List<Team>> getJoinedTeam(Long userId, HttpServletRequest request) {
+        // controller对参数的校验
+        if (userId == null) {
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
+        }
+
+        List<Team> joinedTeam = teamService.getJoinedTeam(userId, request);
+        return ResultUtils.success(joinedTeam);
     }
 }

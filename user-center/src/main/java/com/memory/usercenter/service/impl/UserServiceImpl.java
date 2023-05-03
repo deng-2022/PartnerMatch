@@ -83,7 +83,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 2.对密码进行加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
-//        System.out.println(encryptPassword);
 
         // 3.向数据库中插入用户数据
         User user = new User();
