@@ -15,6 +15,19 @@ export type userType = {
   tags?: string;
 };
 
+// 队伍信息
+export type teamType = {
+  id?: number;
+  userId?: number;
+  name?: string;
+  description?: string;
+  maxNum?: number;
+  joinNum?: number;
+  status?: string;
+  expireTime?: Date;
+  createTime?: Date;
+};
+
 // 用户修改信息
 export type editUserType = {
   editKey: string;
@@ -29,8 +42,8 @@ export type userLoginRequest = {
 
 // 后端响应信息形式
 export type requestData = {
-  code: number;
+  code?: number;
   data?: string;
-  decription: string;
-  message: string;
+  decription?: string;
+  message?: string;
 };

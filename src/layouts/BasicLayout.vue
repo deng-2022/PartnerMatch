@@ -16,7 +16,7 @@
     <router-view />
   </div>
 
-  <slot> 这里是内容 </slot>
+  <!-- <slot> 这里是内容 </slot> -->
 
   <!-- 标签页 -->
   <van-tabbar route>

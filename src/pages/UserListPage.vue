@@ -1,25 +1,27 @@
 <template>
-  <van-card
-    v-for="user in userList"
-    :tag="`${user.gender}`"
-    :title="`${user.userAccount} ${user.username} ${user.planetCode}`"
-    :desc="user.profile"
-    thumb="https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
-  >
-    <template #tags>
-      <van-tag
-        plain
-        type="primary"
-        v-for="tag in user.tags"
-        style="margin-right: 3px; margin-top: 3px"
-      >
-        {{ tag }}
-      </van-tag>
-    </template>
-    <template #footer>
-      <van-button size="mini">联系俺</van-button>
-    </template>
-  </van-card>
+  <div id="content" style="padding-bottom: 57px">
+    <van-card
+      v-for="user in userList"
+      :tag="user.gender"
+      :title="`${user.userAccount} ${user.username} ${user.planetCode}`"
+      :desc="user.profile"
+      thumb="https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg"
+    >
+      <template #tags>
+        <van-tag
+          plain
+          type="primary"
+          v-for="tag in user.tags"
+          style="margin-right: 3px; margin-top: 3px"
+        >
+          {{ tag }}
+        </van-tag>
+      </template>
+      <template #footer>
+        <van-button size="mini">联系俺</van-button>
+      </template>
+    </van-card>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -74,32 +76,33 @@ onMounted(async () => {
   }
 });
 
-const users = [
-  {
-    id: 1,
-    userAccount: "memory",
-    username: "邓哈哈",
-    avatarUrl: "",
-    gender: "男",
-    phone: "18887786754",
-    email: "3348407547@qq.com",
-    planetCode: "17625",
-    createTime: new Date(),
-    profile: "这个用户很懒，什么也没写~",
-    tags: ["java", "emo", "努力中"],
-  },
-  {
-    id: 1,
-    userAccount: "memory",
-    username: "邓哈哈",
-    avatarUrl: "",
-    gender: "男",
-    phone: "18887786754",
-    email: "3348407547@qq.com",
-    planetCode: "17625",
-    createTime: new Date(),
-    profile: "这个用户很懒，什么也没写~",
-    tags: ["java", "emo", "努力中"],
-  },
-];
+// 测试数据
+// const users = [
+//   {
+//     id: 1,
+//     userAccount: "memory",
+//     username: "邓哈哈",
+//     avatarUrl: "",
+//     gender: "男",
+//     phone: "18887786754",
+//     email: "3348407547@qq.com",
+//     planetCode: "17625",
+//     createTime: new Date(),
+//     profile: "这个用户很懒，什么也没写~",
+//     tags: ["java", "emo", "努力中"],
+//   },
+//   {
+//     id: 1,
+//     userAccount: "memory",
+//     username: "邓哈哈",
+//     avatarUrl: "",
+//     gender: "男",
+//     phone: "18887786754",
+//     email: "3348407547@qq.com",
+//     planetCode: "17625",
+//     createTime: new Date(),
+//     profile: "这个用户很懒，什么也没写~",
+//     tags: ["java", "emo", "努力中"],
+//   },
+// ];
 </script>

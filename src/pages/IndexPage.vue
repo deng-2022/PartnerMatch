@@ -1,5 +1,5 @@
 <template>
-  <div id="content" style="padding-bottom: 30px">
+  <div id="content" style="padding-bottom: 53px">
     <!-- 用户信息页 -->
     <van-card
       v-for="user in userList"
@@ -27,6 +27,7 @@
     <van-empty v-if="!userList" description="获取用户信息失败" />
     <!-- 分页插件 -->
     <van-pagination
+      v-if="userList"
       v-model="currentPage"
       :total-items="total"
       :items-per-page="pageSize"
@@ -42,8 +43,8 @@ import { onMounted } from "vue";
 import { userType } from "../models/user";
 import myAxios from "../plugins/myAxios";
 
+// 用户列表
 const userList = ref([]);
-
 // 当前页码
 const currentPage = ref(1);
 // 每页显示数
@@ -91,6 +92,7 @@ const getPage = async (currentPage: number) => {
 onMounted(() => {
   getPage(currentPage.value);
 });
+
 // 改变页码
 const change = () => {
   console.log(currentPage.value);

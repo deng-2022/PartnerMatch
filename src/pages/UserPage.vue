@@ -81,7 +81,7 @@ onMounted(async () => {
     showSuccessToast("获取用户信息成功");
     user.value = res.data;
   } else {
-    showFailToast("获取用户信息失败");
+    showSuccessToast("获取用户信息失败");
   }
 });
 
