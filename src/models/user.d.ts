@@ -23,7 +23,7 @@ export type teamType = {
   description?: string;
   maxNum?: number;
   joinNum?: number;
-  status?: string;
+  status?: number;
   expireTime?: Date;
   createTime?: Date;
 };
