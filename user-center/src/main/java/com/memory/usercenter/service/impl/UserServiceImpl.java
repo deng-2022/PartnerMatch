@@ -11,15 +11,16 @@ import com.memory.usercenter.exception.BusinessException;
 import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.service.UserService;
 import com.memory.usercenter.mapper.UserMapper;
+import com.memory.usercenter.utils.AlgorithmUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.marshalling.Pair;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -131,7 +132,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         QueryWrapper<User> qw = new QueryWrapper<>();
         qw.eq("user_account", userAccount).eq("user_password", encryptPassword);
-        User one = this.getOne(qw);
+//        User one = this.getOne(qw);
+        User one = userMapper.selectOne(qw);
 
         // 1.5.1.用户未注册(包含了MP自带的逻辑删除校验)
         if (one == null) throw new BusinessException(NOT_REGISTER);
@@ -360,6 +362,73 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User getLoginUser(HttpServletRequest request) {
         User loginUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
         return getSafetyUser(loginUser);
+    }
+
+    /**
+     * 用户匹配
+     *
+     * @param num     推荐/匹配数目
+     * @param request request 获取登陆用户
+     * @return 匹配到的用户
+     */
+    @Override
+    public List<User> matchUsers(long num, HttpServletRequest request) {
+        // 1.获取登录用户标签(json字符串 -> List列表)
+        User loginUser = getLoginUser(request);
+        String tags = loginUser.getTags();
+        Gson gson = new Gson();
+        List<String> tagList = gson.fromJson(tags, new TypeToken<List<String>>() {
+        }.getType());
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.isNotNull("tags");
+        queryWrapper.select("id", "tags");
+        // 2.遍历所有查询到的用户, 依次进行标签比较, 并存储到容器中
+        // 2.1.查询到所有用户
+        List<User> userList = this.list();
+        // 2.2.使用SortedMap容器
+        List<Pair<User, Long>> userDistanceList = new ArrayList<>();
+        for (User user : userList) {
+            // 2.2.1.拿到用户
+            // 2.2.2.拿到其标签
+            String userTags = user.getTags();
+            // 2.2.3.无标签用户, 直接过滤, 匹配结果剔除自己
+            if (StringUtils.isBlank(userTags) || user.getId().equals(loginUser.getId())) {
+                continue;
+            }
+            // 2.2.4.转换标签(json字符串 -> List列表)
+            List<String> userTagList = gson.fromJson(userTags, new TypeToken<List<String>>() {
+            }.getType());
+            // 2.2.5.进行标签比较(编辑距离算法)
+            long distance = AlgorithmUtils.minDistance(tagList, userTagList);
+            // 2.2.6.将比较结果存入SortedMap容器中(存储了用户下标和匹配度, 并按distance升序排列)
+            userDistanceList.add(new Pair<>(user, distance));
+        }
+
+        // 3.按编辑距离由小到大排序
+        List<Pair<User, Long>> sortedUserDistanceList = userDistanceList.stream()
+                .sorted((a, b) -> (int) (a.getB() - b.getB()))
+                .limit(num)
+                .collect(Collectors.toList());
+
+        // 4.有顺序的userID列表
+        List<Long> userIdList = sortedUserDistanceList.stream().map(pair -> pair.getA().getId()).collect(Collectors.toList());
+
+        // 5.根据id查询user完整信息
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.in("id", userIdList);
+        Map<Long, List<User>> userIdUserListMap = this.list(userQueryWrapper).stream()
+                .map(this::getSafetyUser)
+                .collect(Collectors.groupingBy(User::getId));
+
+        // 6.因为上面查询打乱了顺序，这里根据上面有序的userId列表赋值
+        List<User> finalUserList = new ArrayList<>();
+        for (Long userId : userIdList) {
+            finalUserList.add(userIdUserListMap.get(userId).get(0));
+        }
+
+        // 7.返回匹配用户列表
+        return finalUserList;
     }
 
 

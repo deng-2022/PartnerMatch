@@ -1,5 +1,6 @@
 package com.memory.usercenter.model.request.team;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -30,6 +31,7 @@ public class TeamAdd {
     /**
      * 过期时间
      */
+    @JsonFormat(pattern = "yyyy/MM/dd")
     private Date expireTime;
 
     /**

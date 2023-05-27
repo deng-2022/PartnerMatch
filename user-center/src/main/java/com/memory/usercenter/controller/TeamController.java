@@ -6,7 +6,6 @@ import com.memory.usercenter.common.ErrorCode;
 import com.memory.usercenter.common.ResultUtils;
 import com.memory.usercenter.exception.BusinessException;
 import com.memory.usercenter.model.entity.Team;
-import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.model.request.team.*;
 import com.memory.usercenter.service.TeamService;
 import org.springframework.web.bind.annotation.*;
@@ -149,10 +148,10 @@ public class TeamController {
     }
 
     /**
-     * 获取当前队伍信息
+     * 获取用户已加入的队伍信息
      *
      * @param userId 用户id
-     * @return 队伍信息
+     * @return 已加入队伍信息
      */
     @GetMapping("/joined")
     public BaseResponse<List<Team>> getJoinedTeam(Long userId, HttpServletRequest request) {
@@ -162,6 +161,23 @@ public class TeamController {
         }
 
         List<Team> joinedTeam = teamService.getJoinedTeam(userId, request);
+        return ResultUtils.success(joinedTeam);
+    }
+
+    /**
+     * 获取用户已创建的队伍信息
+     *
+     * @param userId 用户id
+     * @return 已创建队伍信息
+     */
+    @GetMapping("/created")
+    public BaseResponse<List<Team>> getCreatedTeam(Long userId, HttpServletRequest request) {
+        // controller对参数的校验
+        if (userId == null) {
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
+        }
+
+        List<Team> joinedTeam = teamService.getCreatedTeam(userId, request);
         return ResultUtils.success(joinedTeam);
     }
 }

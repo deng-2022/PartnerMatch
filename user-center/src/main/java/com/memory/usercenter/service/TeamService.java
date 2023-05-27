@@ -24,8 +24,6 @@ public interface TeamService extends IService<Team> {
      */
     String teamAdd(TeamAdd team, HttpServletRequest request);
 
-    int teamDelete(long id);
-
     /**
      * 修改队伍
      *
@@ -82,6 +80,14 @@ public interface TeamService extends IService<Team> {
      * @return 队伍信息
      */
     List<Team> getJoinedTeam(Long userId, HttpServletRequest request);
+
+    /**
+     * 获取已创建队伍信息
+     *
+     * @param userId 用户id
+     * @return 队伍信息
+     */
+    List<Team> getCreatedTeam(Long userId, HttpServletRequest request);
 
     Boolean isAdmin(User loginUser);
 

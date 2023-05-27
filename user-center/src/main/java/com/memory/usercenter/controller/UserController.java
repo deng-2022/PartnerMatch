@@ -192,4 +192,21 @@ public class UserController {
         return ResultUtils.success(update);
     }
 
+    /**
+     * 用户匹配
+     *
+     * @param num     推荐/匹配数目
+     * @param request request 获取登陆用户
+     * @return 匹配到的用户
+     */
+    @GetMapping("/match")
+    public BaseResponse<List<User>> matchUsers(Integer num, HttpServletRequest request) {
+        // controller对参数的校验
+        if (num == null)
+            throw new BusinessException(PARMS_ERROR);
+
+        List<User> userList = userService.matchUsers(num, request);
+        return ResultUtils.success(userList);
+    }
+
 }

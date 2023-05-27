@@ -13,12 +13,12 @@ public class TeamDelete {
     /**
      * 队伍id
      */
-    private Long userId;
+    private Long id;
 
     /**
      * 队长id
      */
-    private Long id;
+    private Long userId;
 
     /**
      * 0 - 公开，1 - 私有，2 - 加密

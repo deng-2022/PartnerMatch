@@ -1,9 +1,13 @@
-package com.memory.usercenter;
+package com.memory.usercenter.insertUser;
 
+import com.memory.usercenter.UserCenterApplication;
 import com.memory.usercenter.model.entity.User;
 import com.memory.usercenter.service.UserService;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StopWatch;
 
@@ -18,7 +22,8 @@ import java.util.concurrent.CompletableFuture;
  * Function:
  * Version 1.0
  */
-@SpringBootTest
+@SpringBootTest(classes = UserCenterApplication.class)
+
 public class InsertUserTest {
     @Resource
     private UserService userService;
@@ -117,15 +122,15 @@ public class InsertUserTest {
                 String password = DigestUtils.md5DigestAsHex((SALT + 12345678).getBytes());
                 user.setUserPassword(password);
                 user.setAvatarUrl("https://fastly.jsdelivr.net/npm/@vant/assets/ipad.jpeg");
-                user.setGender("1");
-//                user.setGender("0");
+//                user.setGender("1");
+                user.setGender("0");
                 user.setPhone("18535854763");
                 user.setEmail("3348407547@qq.com");
                 user.setUserStatus(0);
                 user.setUserRole(0);
-                user.setTags("[\"男\",\"Java\",\"Python\",\"在校本科\",\"开朗\",\"努力中\"]");
-//                user.setTags("[\"女\",\"Vue\",\"Python\",\"在校本科\",\"发呆\",\"emo中\"]");
-
+                user.setPlanetCode("17625");
+//                user.setTags("[\"男\",\"Java\",\"Python\",\"在校本科\",\"开朗\",\"努力中\"]");
+                user.setTags("[\"女\",\"Vue\",\"Python\",\"在校本科\",\"发呆\",\"emo中\"]");
                 userList.add(user);
                 // 当该线程插满1000条数据，便退出该线程循环
                 if (j % batchSize == 0) {
