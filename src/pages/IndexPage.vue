@@ -6,11 +6,11 @@
   />
 
   <!-- 首页轮播图 -->
-  <van-swipe :autoplay="3000" lazy-render :width="480" :height="300">
+  <!-- <van-swipe :autoplay="3000" lazy-render :width="480" :height="300">
     <van-swipe-item v-for="image in images" :key="image">
       <img :src="image" />
     </van-swipe-item>
-  </van-swipe>
+  </van-swipe> -->
 
   <van-field name="switch" label="开启每周推荐">
     <template #input>
@@ -51,10 +51,7 @@
       </template>
     </van-card>
     <!-- 无用户信息展示 -->
-    <van-empty
-      v-if="matchUserList === [] || !matchUserList"
-      description="获取用户信息失败"
-    />
+    <van-empty v-else description="获取用户信息失败" />
   </div>
 
   <!-- 用户表单 -->
@@ -67,6 +64,7 @@
 
     <!-- 用户信息页 -->
     <van-card
+      v-if="userList"
       v-for="user in userList"
       :tag="getUserGender(user.gender)"
       :title="`${user.userAccount} ${user.username} ${user.planetCode}`"
@@ -113,7 +111,7 @@ import { getUserGender } from "../service/function/getUserGender";
 
 // 轮播图片
 const images = [
-  "https://gitee.com/deng-2022/pictures/raw/master/images/sunset.jpg",
+  "https://gitee.com/deng-2022/pictures/raw/master/images/0daac29a25d2247724f0b88135a3c23c.jpg",
   "https://gitee.com/deng-2022/pictures/raw/master/images/typora-icon.png",
 ];
 // 开启/关闭每周推荐
@@ -127,7 +125,7 @@ const currentPage = ref(1);
 // 每页显示数
 let pageSize = 10;
 // 总记录数
-let total: number = 0;
+let total = 0;
 // 每周推荐功能
 const matchUsers = async () => {
   console.log("checked = " + checked.value);
@@ -143,9 +141,6 @@ const matchUsers = async () => {
       // 响应
       .then(function (response) {
         // 返回响应数据（用户列表）
-        console.log(response.data);
-        total = response.data.total;
-        pageSize = response.data.size;
         return response.data;
       })
       // 抛异常
@@ -157,11 +152,11 @@ const matchUsers = async () => {
       // 遍历用户数据列表
       userListData.forEach((user: userType) => {
         if (user.tags) user.tags = JSON.parse(user.tags);
-        console.log(user.gender);
-        console.log(typeof user.gender);
       });
       // 处理过后的用户列表
       matchUserList.value = userListData;
+      console.log(currentPage.value);
+      console.log(total);
     }
   } else {
     matchUserList.value = [];

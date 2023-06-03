@@ -133,23 +133,6 @@ onMounted(async () => {
       console.log(error);
     });
 
-  // // 处理已创建队伍状态
-  // if (teamList1) {
-  //   teamList1.forEach((team: teamType) => {
-  //     if (team.status == "0") team.status = "公开";
-  //     else if (team.status == "1") team.status = "私有";
-  //     else team.status = "加密";
-  //   });
-  // }
-  // // 处理已加入队伍状态
-  // if (teamList2) {
-  //   teamList2.forEach((team: teamType) => {
-  //     if (team.status == "0") team.status = "公开";
-  //     else if (team.status == "1") team.status = "私有";
-  //     else team.status = "加密";
-  //   });
-  // }
-
   // 拿到数据
   teamCreated.value = teamList1;
   teamJoined.value = teamList2;
