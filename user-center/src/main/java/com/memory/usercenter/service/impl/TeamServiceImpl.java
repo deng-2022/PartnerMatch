@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.memory.usercenter.constant.UserConstant.ADMIN_ROLE;
 import static com.memory.usercenter.constant.UserConstant.USER_LOGIN_STATE;
@@ -223,33 +224,42 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
 
         QueryWrapper<Team> tqw = new QueryWrapper<>();
 
-        // 1.根据队伍名查询
+        // 1.根据队伍状态查询
+        Integer status = team.getStatus();
+        TeamStatusEnum statusEnum = TeamStatusEnum.getEnumByValue(status);
+        if (statusEnum != null)
+            tqw.eq("status", status);
+
+        // 2.根据队伍名查询
         String name = team.getName();
         if (StringUtils.isNotEmpty(name) && name.length() < 20)
             tqw.like("name", name);
 
-        // 2.根据队伍描述查询
+        // 3.根据队伍描述查询
         String description = team.getDescription();
         if (StringUtils.isNotEmpty(description) && description.length() > 512)
             tqw.like("description", description);
 
-        // 3.根据队长id查询
+        // 4.根据队长id查询
         Long userId = team.getUserId();
         if (userId != null)
             tqw.eq("user_id", userId);
 
-        // 4.根据最大人数查询
+        // 5.根据最大人数查询
         Integer maxNum = team.getMaxNum();
-        if (maxNum >= 3 && maxNum <= 20)
-            tqw.gt("max_num", maxNum).eq("max_num", maxNum);
+        if (maxNum >= 2 && maxNum <= 20)
+            tqw.gt("max_num", maxNum - 1);
 
-        // 5.根据队伍状态查询
-        Integer status = team.getStatus();
-        TeamStatusEnum statusEnum = TeamStatusEnum.getEnumByValue(status);
-        if (statusEnum != null)
-            tqw.like("status", status);
+        // 6.排除当前用户已加入的队伍
+        QueryWrapper<UserTeam> utqw = new QueryWrapper<>();
+        // 6.1.查询当前用户已加入的队伍信息(为提高性能, 仅拿取需要的team_id字段即可)
+        utqw.select("team_id").eq("user_id", loginUser.getId());
+        List<UserTeam> userTeamList = userTeamService.list(utqw);
+        // 6.2.队伍列表排除掉用户已加入的队伍
+        List<Long> teamIdList = userTeamList.stream().map(UserTeam::getTeamId).collect(Collectors.toList());
+        tqw.notIn("id", teamIdList);
 
-        // 6.分页查询
+        // 7.分页查询
         Page<Team> teamPage = this.page(new Page<>(1, 5), tqw);
         if (teamPage == null)
             throw new BusinessException(ErrorCode.UPDATE_ERROR);
@@ -287,16 +297,23 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         if (statusEnum == null)
             throw new BusinessException(ErrorCode.PARMS_ERROR, "队伍状态不符合要求");
 
-        String password = team.getPassword();
-        // 4.1.加入加密队伍必须输入密码
+        // 4.加入加密队伍必须输入密码且必须是正确的密码
         if (TeamStatusEnum.SECRET.equals(statusEnum)) {
+            // 4.1.查询所加队伍的password, 并判断输入的密码是否正确
+            QueryWrapper<Team> tqw = new QueryWrapper<>();
+            tqw.select("password");
+            String password = team.getPassword();
+
             if (StringUtils.isBlank(password) || password.length() > 32)
                 throw new BusinessException(ErrorCode.PARMS_ERROR, "加入加密队伍要提供正确的密码");
+
+            if (!password.equals(this.getById(teamId).getPassword()))
+                throw new BusinessException(ErrorCode.UPDATE_ERROR, "输入的密码不正确");
         }
 
         // 4.2.加入公开队伍不需要密码用户加入公开队伍不需要密码
         if (TeamStatusEnum.PUBLIC.equals(statusEnum)) {
-            if (StringUtils.isNotBlank(password))
+            if (StringUtils.isNotBlank(team.getPassword()))
                 throw new BusinessException(ErrorCode.PARMS_ERROR, "加入公开队伍无需密码");
         }
 
@@ -379,16 +396,16 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
 
         // 4.2.队伍人数为空
         if (joinNum - 1 == 0) {
-            // 4.2.1.删除team记录
-            boolean teamRemove = this.removeById(teamId);
-            if (!teamRemove)
-                throw new BusinessException(ErrorCode.UPDATE_ERROR);
-
-            // 4.2.2.删除user_team记录
+            // 4.2.1.删除user_team记录
             QueryWrapper<UserTeam> uqw = new QueryWrapper<>();
             uqw.eq("team_id", teamId);
             boolean userTeamRemove = userTeamService.remove(uqw);
             if (!userTeamRemove)
+                throw new BusinessException(ErrorCode.UPDATE_ERROR);
+
+            // 4.2.2.删除team记录
+            boolean teamRemove = this.removeById(teamId);
+            if (!teamRemove)
                 throw new BusinessException(ErrorCode.UPDATE_ERROR);
         }
 
@@ -401,14 +418,21 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             if (!updateNum)
                 throw new BusinessException(ErrorCode.UPDATE_ERROR);
 
-            // 6.校验用户为队长(传位)
+            // 6.删除user_team记录
+            QueryWrapper<UserTeam> uqw = new QueryWrapper<>();
+            uqw.eq("team_id", teamId);
+            boolean userTeamRemove = userTeamService.remove(uqw);
+            if (!userTeamRemove)
+                throw new BusinessException(ErrorCode.UPDATE_ERROR);
+
+            // 7.校验用户为队长(传位)
             if (team.getUserId().equals(loginUser.getId())) {
-                // 6.1.userTeam表查询: 按加入队伍时间升序排序
+                // 7.1.userTeam表查询: 按加入队伍时间升序排序
                 QueryWrapper<UserTeam> utqw = new QueryWrapper<>();
                 utqw.eq("team_id", teamId).orderByAsc("create_time");
                 List<UserTeam> userTeamList = userTeamService.list(utqw);
 
-                // 6.2.将加入时间第二早的队员指定为队长
+                // 7.2.将加入时间第二早的队员指定为队长
                 UserTeam userTeam = userTeamList.get(1);
                 Long userId = userTeam.getUserId();
                 UpdateWrapper<Team> utuw = new UpdateWrapper<>();
@@ -417,7 +441,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
                 if (!updateUser)
                     throw new BusinessException(ErrorCode.UPDATE_ERROR);
 
-                // 6.3.删除原队长
+                // 7.3.删除原队长
                 utqw = new QueryWrapper<>();
                 utqw.eq("user_id", team.getUserId());
                 boolean remove = userTeamService.remove(utqw);
@@ -426,7 +450,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             }
         }
 
-        // 6.退出队伍
+        // 8.退出队伍
         return "退出队伍成功";
     }
 

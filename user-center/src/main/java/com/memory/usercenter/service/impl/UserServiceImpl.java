@@ -311,7 +311,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String redisKey = String.format("memory:user:recommend:%s", loginUser.getId());
         // 查缓存
         Page<User> userPage = (Page<User>) redisTemplate.opsForValue().get(redisKey);
-        // 缓存未中, 则返回用户信息
+        // 缓存命中, 则返回用户信息
         if (userPage != null) {
             return userPage;
         }
@@ -385,7 +385,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.select("id", "tags");
         // 2.遍历所有查询到的用户, 依次进行标签比较, 并存储到容器中
         // 2.1.查询到所有用户
-        List<User> userList = this.list();
+        List<User> userList = this.list(queryWrapper);
         // 2.2.使用SortedMap容器
         List<Pair<User, Long>> userDistanceList = new ArrayList<>();
         for (User user : userList) {

@@ -13,7 +13,7 @@ import org.junit.Assert;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.DigestUtils;
 
-@SpringBootTest
+@SpringBootTest(classes = UserCenterApplication.class)
 @RunWith(SpringRunner.class)
 class UserCenterApplicationTests {
     @Resource

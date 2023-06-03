@@ -1,5 +1,6 @@
 package com.memory.usercenter.service;
 
+import com.memory.usercenter.UserCenterApplication;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
@@ -14,7 +15,7 @@ import javax.annotation.Resource;
  * Version 1.0
  */
 
-@SpringBootTest
+@SpringBootTest(classes = UserCenterApplication.class)
 public class UserServiceTest {
     @Resource
     private UserService userService;

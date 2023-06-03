@@ -50,7 +50,7 @@ public class PreCacheJob {
                     Page<User> userPage = userService.page(new Page<>(1, 20), qw);
                     // 为每个重点用户设置预查询锁
                     String redisKey = String.format("memory:user:recommend:%s", userId);
-                    //写缓存,30s过期
+                    // 写缓存,30s过期
                     try {
                         redisTemplate.opsForValue().set(redisKey, userPage, 30000, TimeUnit.MILLISECONDS);
                     } catch (Exception e) {

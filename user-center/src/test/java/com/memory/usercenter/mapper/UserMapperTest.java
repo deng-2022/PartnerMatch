@@ -1,17 +1,25 @@
 package com.memory.usercenter.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.memory.usercenter.UserCenterApplication;
 import com.memory.usercenter.model.entity.User;
+import com.memory.usercenter.model.entity.UserTeam;
+import com.memory.usercenter.service.TeamService;
 import com.memory.usercenter.service.UserService;
+import com.memory.usercenter.service.UserTeamService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.util.List;
 
-@SpringBootTest
+@SpringBootTest(classes = UserCenterApplication.class)
 public class UserMapperTest {
     @Resource
     UserService userService;
+    TeamService teamService;
+    UserTeamService userTeamService;
 
     @Test
     public void testAddUser() {
@@ -28,5 +36,7 @@ public class UserMapperTest {
         Assertions.assertTrue(save);
         System.out.println(save);
     }
+
+
 
 }
