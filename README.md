@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Vue 3 + TypeScript + Vite
 
 This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
@@ -22,6 +23,12 @@ If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has a
 
 #### 介绍
 伙伴匹配系统
+=======
+# ClientCenter
+
+#### 介绍
+用户中心
+>>>>>>> 0644f0289aef1912fae4960312603b7a1d3afb58
 
 #### 软件架构
 软件架构说明
@@ -55,4 +62,7 @@ If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has a
 4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
 5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
 6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+<<<<<<< HEAD
 >>>>>>> c812499aab3e7849331716ce19028bd16191edb2
+=======
+>>>>>>> 0644f0289aef1912fae4960312603b7a1d3afb58
