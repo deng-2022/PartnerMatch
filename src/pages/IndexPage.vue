@@ -135,7 +135,7 @@ const matchUsers = async () => {
     const userListData = await myAxios
       .get("/user/match", {
         params: {
-          num: 3,
+          num: 6,
         },
       })
       // 响应
