@@ -7,8 +7,9 @@
     @click-left="onClickLeft"
     @click-right="onClickRight"
   >
+    <!-- 右侧按钮 -->
     <template #right>
-      <van-icon name="search" size="18" />
+      <van-icon name="setting-o" size="18" />
     </template>
   </van-nav-bar>
 
@@ -21,10 +22,11 @@
   <!-- 标签页 -->
   <van-tabbar route>
     <van-tabbar-item to="/" icon="home-o" name="index">主页</van-tabbar-item>
-    <van-tabbar-item to="/team" icon="search" name="team">队伍</van-tabbar-item>
-    <van-tabbar-item to="/user" icon="friends-o" name="user"
-      >个人</van-tabbar-item
+    <van-tabbar-item to="/team" icon="paid" name="team">队伍 </van-tabbar-item>
+    <van-tabbar-item to="/friend" icon="friends-o" name="friend"
+      >联系人</van-tabbar-item
     >
+    <van-tabbar-item to="/user" icon="user-o" name="user">个人</van-tabbar-item>
   </van-tabbar>
 </template>
 

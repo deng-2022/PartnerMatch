@@ -1,50 +1,21 @@
 <template>
-  <!-- 搜索表单 -->
-  <van-form @submit="onSearchTeam">
-    <van-cell-group inset>
-      <van-field
-        v-model="searchItem.name"
-        name="name"
-        label="队伍名"
-        placeholder="请输入队伍名"
-        :rules="[{ message: '请输入队伍名' }]"
-      />
+  <!-- 筛选按钮 -->
+  <van-button
+    plain
+    type="success"
+    style="margin-left: 110px"
+    @click="showSearchMenu"
+    >点此筛选所需队伍</van-button
+  >
 
-      <van-field
-        v-model="searchItem.description"
-        rows="4"
-        name="description"
-        label="队伍描述"
-        type="textarea"
-        placeholder="请输入队伍描述"
-      />
-
-      <van-field
-        v-model="searchItem.userId"
-        name="userId"
-        label="队长id"
-        placeholder="请输入队长id"
-        :rules="[{ message: '请输入队长id' }]"
-      />
-
-      <van-field name="maxNum" label="最少人数">
-        <template #input>
-          <van-stepper v-model="searchItem.maxNum" max="20" min="2" />
-        </template>
-      </van-field>
-    </van-cell-group>
-
-    <div style="margin: 16px">
-      <van-button round block type="primary" native-type="submit">
-        查询队伍
-      </van-button>
-    </div>
-  </van-form>
-
-  <van-divider content-position="left">符合条件的队伍</van-divider>
+  <!-- 分割线 -->
+  <van-divider
+    :style="{ color: '#1989fa', borderColor: '#1989fa', padding: '0 16px' }"
+    >符合条件的队伍</van-divider
+  >
 
   <!-- 队伍列表分页展示 -->
-  <van-tabs v-model:active="active">
+  <van-tabs v-model:active="active" swipeable>
     <!-- 公开队伍列表 -->
     <van-tab title="公开" style="padding-bottom: 57px">
       <van-card
@@ -118,6 +89,56 @@
   >
     <van-field v-model="password" placeholder="请输入密码"> </van-field>
   </van-dialog>
+
+  <!-- 搜索条件圆角弹窗（底部） -->
+  <van-popup
+    v-model:show="showBottom"
+    round
+    position="bottom"
+    :style="{ height: '50%' }"
+  >
+    <!-- 搜索表单 -->
+    <van-form @submit="onSearchTeam">
+      <van-cell-group inset>
+        <van-field
+          v-model="searchItem.name"
+          name="name"
+          label="队伍名"
+          placeholder="请输入队伍名"
+          :rules="[{ message: '请输入队伍名' }]"
+        />
+
+        <van-field
+          v-model="searchItem.description"
+          rows="4"
+          name="description"
+          label="队伍描述"
+          type="textarea"
+          placeholder="请输入队伍描述"
+        />
+
+        <van-field
+          v-model="searchItem.userId"
+          name="userId"
+          label="队长id"
+          placeholder="请输入队长id"
+          :rules="[{ message: '请输入队长id' }]"
+        />
+
+        <van-field name="maxNum" label="最少人数">
+          <template #input>
+            <van-stepper v-model="searchItem.maxNum" max="20" min="2" />
+          </template>
+        </van-field>
+      </van-cell-group>
+
+      <div style="margin: 16px">
+        <van-button round block type="primary" native-type="submit">
+          查询队伍
+        </van-button>
+      </div>
+    </van-form>
+  </van-popup>
 </template>
 
 <script lang="ts" setup>
@@ -126,6 +147,8 @@ import { onMounted, ref } from "vue";
 import myAxios from "../../plugins/myAxios";
 import { getTeamStatus } from "../../service/function/getTeamStatus";
 
+// 展示底部搜索条件
+const showBottom = ref(false);
 // 加入队伍参数
 const joinTeamParam = ref({});
 // 队伍密码
@@ -204,6 +227,7 @@ onMounted(async () => {
 // 搜索队伍
 const onSearchTeam = async () => {
   let teamListData;
+  // 判断为公开队伍栏
   if (active.value === 0) {
     teamListData = await myAxios
       .get("/team/list/page", {
@@ -227,7 +251,9 @@ const onSearchTeam = async () => {
     // 拿取公开队伍列表
     pubTeamList.value = teamListData;
     console.log(pubTeamList.value);
-  } else {
+  }
+  // 加密队伍栏
+  else {
     teamListData = await myAxios
       .get("/team/list/page", {
         params: {
@@ -252,6 +278,8 @@ const onSearchTeam = async () => {
     console.log(safeTeamList.value);
   }
 
+  // 关闭底部搜索条件弹窗
+  showBottom.value = false;
   // 拿取队伍列表
   safeTeamList.value = teamListData;
   console.log(safeTeamList.value);
@@ -297,5 +325,10 @@ const toJoinTeam = async (team: any, password: any) => {
     showSuccessToast(`joinTeam`);
     console.log(joinTeam);
   }
+};
+
+// 弹出底部搜索条件弹窗
+const showSearchMenu = () => {
+  showBottom.value = true;
 };
 </script>

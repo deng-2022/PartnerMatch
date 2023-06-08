@@ -9,6 +9,7 @@ import TeamPage from "../pages/team/TeamPage.vue";
 import TeamEditPage from "../pages/team/TeamEditPage.vue";
 import TeamAddPage from "../pages/team/TeamAddPage.vue";
 import TeamListPage from "../pages/team/TeamListPage.vue";
+import FriendPage from "../pages/friend/FriendPage.vue";
 
 // 2. 定义一些路由
 // 每个路由都需要映射到一个组件
@@ -25,6 +26,8 @@ const routes = [
   { path: "/team/edit", title: "队伍编辑", component: TeamEditPage }, // 队伍修改页
   { path: "/team/add", title: "队伍新增页", component: TeamAddPage }, // 队伍修改页
   { path: "/team/list", title: "队伍列表页", component: TeamListPage }, // 队伍列表页
+
+  { path: "/friend", title: "用户列表页", component: FriendPage }, // 队伍列表页
 ];
 
 export default routes;
