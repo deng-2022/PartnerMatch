@@ -1,21 +1,24 @@
 // 1. 定义路由组件.
-import IndexPage from "../pages/IndexPage.vue";
-import UserPage from "../pages/UserPage.vue";
-import SearchPage from "../pages/SearchPage.vue";
-import UserEditPage from "../pages/UserEditPage.vue";
-import UserListPage from "../pages/UserListPage.vue";
-import UserLoginPage from "../pages/UserLoginPage.vue";
+import IndexPage from "../pages/index/IndexPage.vue";
+import UserPage from "../pages/user/UserPage.vue";
+import SearchPage from "../pages/user/SearchPage.vue";
+import UserEditPage from "../pages/user/UserEditPage.vue";
+import UserListPage from "../pages/user/UserListPage.vue";
+import UserLoginPage from "../pages/user/UserLoginPage.vue";
 import TeamPage from "../pages/team/TeamPage.vue";
 import TeamEditPage from "../pages/team/TeamEditPage.vue";
 import TeamAddPage from "../pages/team/TeamAddPage.vue";
 import TeamListPage from "../pages/team/TeamListPage.vue";
 import FriendPage from "../pages/friend/FriendPage.vue";
+import codeLoginPage from "../pages/index/CodeLoginPage.vue";
 
 // 2. 定义一些路由
 // 每个路由都需要映射到一个组件
 // 我们后面再讨论嵌套路由
 const routes = [
   { path: "/", title: "主页", component: IndexPage }, // 主页
+  { path: "/code/login", title: "验证码登录", component: codeLoginPage }, // 验证码登录页
+
   { path: "/user", title: "个人信息页", component: UserPage }, // 个人页
   { path: "/search", title: "用户搜索页", component: SearchPage }, // 搜索页
   { path: "/user/edit", title: "用户编辑页", component: UserEditPage }, // 用户信息修改页

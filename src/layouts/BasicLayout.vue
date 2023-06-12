@@ -53,17 +53,20 @@ onMounted(async () => {
     router.replace("/user/login");
   }
 });
-//
+
+// 跳转页面前校验将要跳转的路由(目标路由)
 router.beforeEach((to) => {
-  // 拿取跳转页面路由的path
+  // 拿取目标路由的path
   const toPath = to.path;
-  // 在自定义路由中逐个比对
+  // 逐个比对自定义路由中的path
   const route = routes.find((route) => {
+    // 匹配到该路由的path
     return toPath == route.path;
   });
-  // 拿取匹配的页面路由的title
+  // 设置title为匹配路由的title
   title.value = route?.title ?? DEFAULT_TITLE;
 });
+
 // 左”/“按钮, 返回上个页面
 const onClickLeft = () => {
   router.back();
