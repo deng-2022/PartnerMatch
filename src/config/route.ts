@@ -10,14 +10,16 @@ import TeamEditPage from "../pages/team/TeamEditPage.vue";
 import TeamAddPage from "../pages/team/TeamAddPage.vue";
 import TeamListPage from "../pages/team/TeamListPage.vue";
 import FriendPage from "../pages/friend/FriendPage.vue";
-import codeLoginPage from "../pages/index/CodeLoginPage.vue";
+import CodeLoginPage from "../pages/index/CodeLoginPage.vue";
+import UserRegisterPage from "../pages/index/UserRegisterPage.vue";
 
 // 2. 定义一些路由
 // 每个路由都需要映射到一个组件
 // 我们后面再讨论嵌套路由
 const routes = [
   { path: "/", title: "主页", component: IndexPage }, // 主页
-  { path: "/code/login", title: "验证码登录", component: codeLoginPage }, // 验证码登录页
+  { path: "/code/login", title: "验证码登录", component: CodeLoginPage }, // 验证码登录页
+  { path: "/user/register", title: "新用户注册", component: UserRegisterPage }, // 验证码登录页
 
   { path: "/user", title: "个人信息页", component: UserPage }, // 个人页
   { path: "/search", title: "用户搜索页", component: SearchPage }, // 搜索页

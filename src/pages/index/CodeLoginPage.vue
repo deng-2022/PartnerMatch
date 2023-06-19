@@ -23,7 +23,13 @@
         :rules="[{ required: true, message: '请填写验证码' }]"
       />
 
-      <van-button plain type="primary" @click="getCode">发送验证码</van-button>
+      <van-button
+        plain
+        type="primary"
+        @click="getCode"
+        style="margin-left: 222px"
+        >发送验证码</van-button
+      >
     </van-cell-group>
 
     <div style="margin: 16px">

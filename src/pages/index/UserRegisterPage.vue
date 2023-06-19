@@ -17,23 +17,30 @@
         placeholder="密码"
         :rules="[{ required: true, message: '请填写密码' }]"
       />
+
+      <van-field
+        v-model="checkPassword"
+        type="password"
+        name="确认密码"
+        label="确认密码"
+        placeholder="确认密码"
+        :rules="[{ required: true, message: '请再次填写密码' }]"
+      />
+
+      <van-field
+        v-model="planetCode"
+        name="星球编号"
+        label="星球编号"
+        placeholder=" 星球编号"
+        :rules="[{ required: true, message: '请填写星球编号' }]"
+      />
     </van-cell-group>
 
     <div style="margin: 16px">
       <van-button round block type="primary" native-type="submit">
-        登录
+        注册
       </van-button>
     </div>
-
-    <a
-      @click="toUserRegister"
-      style="color: rgb(17, 131, 207); margin-left: 67px"
-      >新用户注册</a
-    >
-
-    <a @click="toCodeLogin" style="color: rgb(17, 131, 207); margin-left: 90px"
-      >验证码登录</a
-    >
   </van-form>
 </template>
 
@@ -45,30 +52,29 @@ import { showSuccessToast, showFailToast } from "vant";
 import { requestData } from "../../models/user";
 
 const router = useRouter();
+// 用户名
 const userAccount = ref("");
+// 密码
 const userPassword = ref("");
+// 确认密码
+const checkPassword = ref("");
+// 星球编号
+const planetCode = ref("");
 
 const onSubmit = async () => {
-  const res: requestData = await myAxios.post("/user/login", {
+  const res: requestData = await myAxios.post("/user/register", {
     userAccount: userAccount.value,
     userPassword: userPassword.value,
+    checkPassword: checkPassword.value,
+    planetCode: planetCode.value,
   });
 
-  // console.log(res, "用户登录");
-  // console.log(res.code, "用户登录");
-  // console.log(res.data, "用户登录");
-
   if (res.code === 0 && res.data) {
-    showSuccessToast(`欢迎您，${userAccount.value}`);
-    router.replace("/");
+    showSuccessToast("注册成功");
+    router.replace("/user/login");
   } else {
-    showFailToast("登录失败");
+    showFailToast("注册失败");
   }
-};
-
-// 跳转至新用户注册页
-const toUserRegister = () => {
-  router.push("/user/register");
 };
 
 // 跳转至验证码登录页
